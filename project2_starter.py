@@ -154,7 +154,7 @@ class Warrior(Player):
         Warriors should have: high health, high strength, low magic
         """
         # TODO: Call super().__init__() with warrior-appropriate stats
-        super().__init__(name, character_class, health, strength, magic))
+        super().__init__(name, character_class, health, strength, magic)
         self.health = 120
         self.strength = 15
         self.magic = 5
