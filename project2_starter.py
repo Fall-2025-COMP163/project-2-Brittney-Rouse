@@ -124,7 +124,7 @@ class Player(Character):
         # TODO: Call super().__init__() with the basic character info
         # TODO: Store the character_class (like "Warrior", "Mage", etc.)
         # TODO: Add any other player-specific attributes (level, experience, etc.)
-        super().__init__()
+        super().__init__(name, character_class, health, strength, magic)
         self.character_class = character_class
         self.level = int(input())
         self.experience = int(input())
@@ -154,7 +154,7 @@ class Warrior(Player):
         Warriors should have: high health, high strength, low magic
         """
         # TODO: Call super().__init__() with warrior-appropriate stats
-        super().__init__()
+        super().__init__(name, character_class, health, strength, magic))
         self.health = 120
         self.strength = 15
         self.magic = 5
@@ -197,7 +197,7 @@ class Mage(Player):
         """
         # TODO: Call super().__init__() with mage-appropriate stats
         # Suggested stats: health=80, strength=8, magic=20
-        super().__init__()
+        super().__init__(name, character_class, health, strength, magic)
         self.health = 80
         self.strength = 8
         self.magic = 20
@@ -239,7 +239,7 @@ class Rogue(Player):
         """
         # TODO: Call super().__init__() with rogue-appropriate stats
         # Suggested stats: health=90, strength=12, magic=10
-        super().__init__()
+        super().__init__(name, character_class, health, strength, magic)
         self.health = 90
         self.strength = 12
         self.magic = 10
@@ -282,7 +282,7 @@ class Weapon:
         Create a weapon with a name and damage bonus.
         """
         # TODO: Store weapon name and damage bonus
-        weapon_name = name
+        self.name = name
         self.damage_bonus = damage_bonus
     
         
@@ -291,7 +291,8 @@ class Weapon:
         Display information about this weapon.
         """
         # TODO: Print weapon name and damage bonus
-        print(f"{weapon_name}: {damage_bonus} damage bouns")
+        Weapon.__init__(self, name, damage_bonus)
+        print(f"{self.weapon_name}: {self.damage_bonus} damage bouns")
 
 
 # ============================================================================
