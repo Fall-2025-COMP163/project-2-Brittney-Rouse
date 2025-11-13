@@ -79,8 +79,8 @@ class Character:
         # TODO: Implement basic attack
         # Damage should be based on self.strength
         # Use target.take_damage(damage) to apply damage
-        damage_taken = target.take_damage(damage) * self.strength
-        print(f"{damage_taken} damage was taken!")
+        self.damage_taken = target.take_damage(damage) * self.strength
+        print(f"{self.damage_taken} damage was taken!")
 
         
     def take_damage(self, damage):
@@ -124,10 +124,10 @@ class Player(Character):
         # TODO: Call super().__init__() with the basic character info
         # TODO: Store the character_class (like "Warrior", "Mage", etc.)
         # TODO: Add any other player-specific attributes (level, experience, etc.)
-        super().__init__(name, character_class, health, strength, magic)
+        super().__init__(self, name, health, strength, magic)
         self.character_class = character_class
-        self.level = int(input())
-        self.experience = int(input())
+        self.level = input()
+        self.experience = input()
 
         
     def display_stats(self):
@@ -137,9 +137,10 @@ class Player(Character):
         """
         # TODO: Call the parent's display_stats method using super()
         # TODO: Then print additional player info like class and level
-        super().display_stats()
-        print(f"{self.level}")
-        print(f"{self.experience}")
+        super().display_stats(self, name, health, strength, magic)
+        print(f"Character Class: {self.character_class}")
+        print(f"Level: {self.level}")
+        print(f"Experience: {self.experience}")
         
 
 class Warrior(Player):
@@ -154,7 +155,8 @@ class Warrior(Player):
         Warriors should have: high health, high strength, low magic
         """
         # TODO: Call super().__init__() with warrior-appropriate stats
-        super().__init__(name, character_class, health, strength, magic)
+        super().__init__(self, name, health, strength, magic)
+        self.name = name
         self.health = 120
         self.strength = 15
         self.magic = 5
@@ -169,7 +171,7 @@ class Warrior(Player):
         # TODO: Implement warrior attack
         # Should do more damage than basic attack
         # Maybe strength + 5 bonus damage?
-        super().attack()
+        super().attack(self, target)
         self.strength = self.strength + 10
         damage_taken = target.take_damage(damage) * self.strength
 
@@ -197,7 +199,8 @@ class Mage(Player):
         """
         # TODO: Call super().__init__() with mage-appropriate stats
         # Suggested stats: health=80, strength=8, magic=20
-        super().__init__(name, character_class, health, strength, magic)
+        super().__init__(self, name, health, strength, magic)
+        self.name = name
         self.health = 80
         self.strength = 8
         self.magic = 20
@@ -210,7 +213,7 @@ class Mage(Player):
         """
         # TODO: Implement mage attack
         # Should use self.magic for damage calculation instead of strength
-        super().attack()
+        super().attack(self, target)
         self.magic = self.magic + 5
         damage_taken = target.take_damage(damage) * self.magic
 
@@ -239,7 +242,8 @@ class Rogue(Player):
         """
         # TODO: Call super().__init__() with rogue-appropriate stats
         # Suggested stats: health=90, strength=12, magic=10
-        super().__init__(name, character_class, health, strength, magic)
+        super().__init__(self, name, health, strength, magic)
+        self.name = name
         self.health = 90
         self.strength = 12
         self.magic = 10
@@ -253,7 +257,7 @@ class Rogue(Player):
         # TODO: Implement rogue attack
         # Could add a chance for critical hit (double damage)
         # Hint: use random.randint(1, 10) and if result <= 3, it's a crit
-        super().attack()
+        super().attack(self, target)
         result = random.randit(1,10)
         if result >=7:
             self.damage = self.damage * 2.5
@@ -292,7 +296,7 @@ class Weapon:
         """
         # TODO: Print weapon name and damage bonus
         Weapon.__init__(self, name, damage_bonus)
-        print(f"{self.weapon_name}: {self.damage_bonus} damage bouns")
+        print(f"{self.weapon_name}: {self.damage_bonus} damage bonus")
 
 
 # ============================================================================
