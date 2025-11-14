@@ -258,8 +258,8 @@ class Mage(Player):
         """
         # TODO: Implement fireball spell
         # Should do magic-based damage with bonus
-        ##Damage is multiplied by three (special attack) and a unique line is printed out
-        damage = self.magic * 3
+        ##Damage is multiplied by two (special attack) and a unique line is printed out
+        damage = self.magic * 2
         target.take_damage(damage)
         print(f"{self.name} deals {damage} damage to {target.name} with a fireball!")
 
