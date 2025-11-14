@@ -3,8 +3,31 @@ COMP 163 - Project 2: Character Abilities Showcase
 Name: Brittney Rouse
 Date: 11/10/25
 
-AI Usage: [Document any AI assistance used]
-Example: AI helped with inheritance structure and method overriding concepts
+AI Usage: ChatGPT helped me with the following issues:
+- BIGGEST MISTAKE : I orignally had undefined values within each subclass for the health, strength, and magic. The valid values were passed directly to super(), and did not
+need to be overriden afterwards. The code was originally written like this:
+super().__init__(self, name, health=120, strength=15, magic=5)
+self.health = health
+self.strength = strength
+self.magic = magic
+This was later changed to the correct code :
+super().__init__(name, "Warrior", health=120, strength=15, magic=5)
+- importing "random" for random.int() for the Rogue's critical hit
+- I had previously put "self" when calling super.__init__() (for example, I had originally put super().__init__(self, name, health, strength, magic) - "self" should NOT have
+been called; I did this for every class, so I had to correct it in multiple places
+- I also called super() incorrectly in Player.display_stats - I had originally had super().display_stats(self, name, health, strength, magic); however, it only needed super().
+display_stats(), with no self or other arguments
+- "damage" was also originally undefined in every single method because of the way I had written it; I had originally written it as self.damage_taken =
+target.take_damage(damage) * self.strength, which is obviously incorrect because damage was never defined. ChatGPT corrected this to the current code (damage = self.strength
+target.take_damage(damage))
+- When checking to see if the health ever went below 0, I originally had it so the health would be changed to 1 if self.health went to 0 OR below, which was incorrect - it
+needed to be self.health = 0 if self.health < 0 (Makes sure the health never goes into the negatives, BUT it's less than one)
+- I also added the character class into the argument in the Warrior, Mage, and Rogue class constructors (I had previously not added that)
+- All overriding attacks duplicated damage - I called the original attack function (super().attack(target)) while ALSO doing the different attack styles; this led to the
+original attack being called AND the unique attacks, doing more than damage than intended
+- Also corrected the output code - print(f"{target.take_damage(damage)} damage was taken!") was changed to print(f"{self.name} dealt {damage} damage to {target.name}!")
+(and later customized for each class)
+- Got rid of redundant lines (I had originally put self.name = name  in every subclass? Silly, simple mistake.)
 """
 
 # ============================================================================
@@ -53,6 +76,9 @@ class SimpleBattle:
 # YOUR CLASSES TO IMPLEMENT (6 CLASSES TOTAL)
 # ============================================================================
 
+##ChatGPT - previously forgot to import random for random.int() in Rogue class
+import random
+
 class Character:
     """
     Base class for all characters.
@@ -63,6 +89,7 @@ class Character:
         """Initialize basic character attributes"""
         # TODO: Set the character's name, health, strength, and magic
         # These should be stored as instance variables
+        ##Sets up a character's name, health, strength, and magic values
         self.name = name
         self.health = health
         self.strength = strength
@@ -79,8 +106,13 @@ class Character:
         # TODO: Implement basic attack
         # Damage should be based on self.strength
         # Use target.take_damage(damage) to apply damage
-        self.damage_taken = target.take_damage(damage) * self.strength
-        print(f"{self.damage_taken} damage was taken!")
+
+        ##ChatGPT helped with the next two lines - I had incorrectly written it before as "self.damage_taken = target.take_damage(damage) * self.strength", which was
+        ##incorrect since damage was never defined.
+        ##This code calculates a basic attack that any character can use (not exclusive to any class)
+        damage = self.strength
+        target.take_damage(damage)
+        print(f"{self.name} deals {damage} damage to {target.name}!")
 
         
     def take_damage(self, damage):
@@ -91,11 +123,14 @@ class Character:
         # TODO: Implement taking damage
         # Reduce self.health by damage amount
         # Make sure health doesn't go below 0
+
+        ##ChatGPT corrected this code slightly (previously, I had it as "if self.health <= 0, self.health = 1" which was a silly mistake (I misread the instructions as
+        ##self.health couldn't equal 0 or less(instead of it not going BELOW 0))
+        ##There was also an unnecessary "else" branch, but what was in the else branch was already written above the if-branch.
+        ##This code takes away the health dealt in an attack; if health goes below 0, it is automatically corrected to exactly 0
         self.health = self.health - damage
-        if self.health <= 0:
-            self.health = 1
-        else:
-            self.health = self.health
+        if self.health < 0:
+            self.health = 0
             
         
     def display_stats(self):
@@ -104,6 +139,7 @@ class Character:
         """
         # TODO: Print character's name, health, strength, and magic
         # Make it look nice with formatting
+        ##Prints the character's current stats with identical formatting
         print(f"Name: {self.name}")
         print(f"Health: {self.health}")
         print(f"Strength: {self.strength}")
@@ -124,10 +160,11 @@ class Player(Character):
         # TODO: Call super().__init__() with the basic character info
         # TODO: Store the character_class (like "Warrior", "Mage", etc.)
         # TODO: Add any other player-specific attributes (level, experience, etc.)
-        super().__init__(self, name, health, strength, magic)
+        ##Initializes the player's character
+        super().__init__(name, health, strength, magic)
         self.character_class = character_class
-        self.level = input()
-        self.experience = input()
+        self.level = 1
+        self.experience = 0
 
         
     def display_stats(self):
@@ -137,7 +174,8 @@ class Player(Character):
         """
         # TODO: Call the parent's display_stats method using super()
         # TODO: Then print additional player info like class and level
-        super().display_stats(self, name, health, strength, magic)
+        ##Displays the original stats with the addition of the player's class, level, and experience
+        super().display_stats()
         print(f"Character Class: {self.character_class}")
         print(f"Level: {self.level}")
         print(f"Experience: {self.experience}")
@@ -155,11 +193,7 @@ class Warrior(Player):
         Warriors should have: high health, high strength, low magic
         """
         # TODO: Call super().__init__() with warrior-appropriate stats
-        super().__init__(self, name, health, strength, magic)
-        self.name = name
-        self.health = 120
-        self.strength = 15
-        self.magic = 5
+        super().__init__(name, "Warrior", health=120, strength=15, magic=5)
         # Suggested stats: health=120, strength=15, magic=5
     
         
@@ -171,9 +205,10 @@ class Warrior(Player):
         # TODO: Implement warrior attack
         # Should do more damage than basic attack
         # Maybe strength + 5 bonus damage?
-        super().attack(self, target)
-        self.strength = self.strength + 10
-        damage_taken = target.take_damage(damage) * self.strength
+        ##Damage has ten additional points taken away, and a line specifically for the warrior is printed out
+        damage = self.strength + 10
+        target.take_damage(damage)
+        print(f"With a solid strike, {self.name} deals {damage} damage to {target.name}!")
 
         
     def power_strike(self, target):
@@ -182,8 +217,10 @@ class Warrior(Player):
         """
         # TODO: Implement power strike
         # Should do significantly more damage than regular attack
-        self.strength = self.strength * 3
-        damage_taken = target.take_damage(damage) * self.strength
+        ##Damage is multiplied by three (very strong attack) and a special line is printed out
+        damage = self.strength * 3
+        target.take_damage(damage)
+        print(f"{self.name} deals {damage} damage to {target.name} with a power strike!")
 
 
 class Mage(Player):
@@ -199,11 +236,7 @@ class Mage(Player):
         """
         # TODO: Call super().__init__() with mage-appropriate stats
         # Suggested stats: health=80, strength=8, magic=20
-        super().__init__(self, name, health, strength, magic)
-        self.name = name
-        self.health = 80
-        self.strength = 8
-        self.magic = 20
+        super().__init__(name, "Mage", health=80, strength=8, magic=20)
 
         
     def attack(self, target):
@@ -213,9 +246,10 @@ class Mage(Player):
         """
         # TODO: Implement mage attack
         # Should use self.magic for damage calculation instead of strength
-        super().attack(self, target)
-        self.magic = self.magic + 5
-        damage_taken = target.take_damage(damage) * self.magic
+        ##Damage is calculated with self.magic instead of self.strength; a line unique to the mage is written
+        damage = self.magic + 5
+        target.take_damage(damage)
+        print(f"With a magical attack, {self.name} deals {damage} damage to {target.name}!")
 
         
     def fireball(self, target):
@@ -224,10 +258,11 @@ class Mage(Player):
         """
         # TODO: Implement fireball spell
         # Should do magic-based damage with bonus
-        self.magic = self.magic * 4
-        damage_taken = target.take_damage(damage) * self.magic
+        ##Damage is multiplied by three (special attack) and a unique line is printed out
+        damage = self.magic * 3
+        target.take_damage(damage)
+        print(f"{self.name} deals {damage} damage to {target.name} with a fireball!")
 
-        
 
 class Rogue(Player):
     """
@@ -242,11 +277,7 @@ class Rogue(Player):
         """
         # TODO: Call super().__init__() with rogue-appropriate stats
         # Suggested stats: health=90, strength=12, magic=10
-        super().__init__(self, name, health, strength, magic)
-        self.name = name
-        self.health = 90
-        self.strength = 12
-        self.magic = 10
+        super().__init__(name, "Rogue", health=90, strength=12, magic=10)
         
         
     def attack(self, target):
@@ -257,12 +288,17 @@ class Rogue(Player):
         # TODO: Implement rogue attack
         # Could add a chance for critical hit (double damage)
         # Hint: use random.randint(1, 10) and if result <= 3, it's a crit
-        super().attack(self, target)
-        result = random.randit(1,10)
-        if result >=7:
-            self.damage = self.damage * 2.5
+        ##Checks for critical attack ("result" must be three or less out of a range of 1-10); if it is a crtical, the damage is multiplied by two, and "Critical hint!" is
+        #printed out. Else, the amount of damage stays the same.
+        result = random.randint(1,10)
+        if result <= 3:
+            damage = self.strength * 2
+            target.take_damage(damage)
+            print(f"{self.name} deals {damage} damage to {target.name}! Critical hit!")
         else:
-            self.damage = self.damage
+            damage = self.strength
+            target.take_damage(damage)
+            print(f"{self.name} deals {damage} damage to {target.name}!")
 
         
     def sneak_attack(self, target):
@@ -271,8 +307,10 @@ class Rogue(Player):
         """
         # TODO: Implement sneak attack
         # Should always do critical damage
-        self.damage = self.damage * 2.5
-        damage_taken = target.take_damage(damage) * self.damage
+        ##Damage is always multiplied by two (critical attack) and a special line is printed out
+        damage = self.strength * 2
+        target.take_damage(damage)
+        print(f"Sneak attack! {self.name} deals {damage} damage to {target.name}!")
 
 
 class Weapon:
@@ -295,8 +333,8 @@ class Weapon:
         Display information about this weapon.
         """
         # TODO: Print weapon name and damage bonus
-        Weapon.__init__(self, name, damage_bonus)
-        print(f"{self.weapon_name}: {self.damage_bonus} damage bonus")
+        ##Shows the weapon name followed by the bonus damage it adds
+        print(f"{self.name}: {self.damage_bonus} damage bonus")
 
 
 # ============================================================================
